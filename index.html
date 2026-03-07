@@ -150,13 +150,6 @@
     // SECCIÓN 1: VARIABLES GLOBALES Y ESTRUCTURAS DE DATOS
     // ═══════════════════════════════════════════════════════════════════════════════════
 
-    // ============================================
-    // 📋 MAPEO DE GIFS PARA TIPOS DE MASCOTAS
-    // ============================================
-    // Propósito: Almacena URLs de GIFs animados para cada tipo de mascota.
-    // Uso: Permite mostrar una imagen representativa según el tipo seleccionado en la cita.
-    // Estructura: Objeto clave-valor donde la clave es el emoji+nombre y el valor es la URL del GIF.
-    // Beneficio: Evita duplicación de URLs en el código y centraliza la gestión de recursos.
     const gifMap = {
       '🐕 Perro': 'https://i.gifer.com/Xqg8.gif',
       '🐈 Gato': 'https://i.gifer.com/NFqM.gif',
@@ -170,13 +163,6 @@
       '🐴 Caballo': 'https://i.gifer.com/XyUU.gif'
     };
 
-    // ============================================
-    // 📊 ARRAY DE CITAS INICIALES
-    // ============================================
-    // Propósito: Almacena todas las citas de pacientes veterinarios.
-    // Estructura: Array de objetos donde cada objeto representa una cita completa.
-    // Propiedades: id, mascota, propietario, telefono, fecha, hora, tipo, sintomas, estado.
-    // Persistencia: Actualmente se almacena en memoria (se pierde al recargar la página).
     let citas = [
       {
         id: '1',
@@ -191,25 +177,8 @@
       },
     ];
 
-    // ============================================
-    // 🆔 CONTADOR PARA IDs DE NUEVAS CITAS
-    // ============================================
-    // Propósito: Genera un ID único para cada nueva cita creada.
-    // Lógica: Inicia con el ID máximo existente + 1 para evitar duplicados.
-    // Incremento: Se aumenta automáticamente cada vez que se crea una nueva cita.
-    // Formato: Se convierte a string para mantener consistencia con los IDs existentes.
     let proximoId = Math.max(...citas.map(c => parseInt(c.id)), 1) + 1;
 
-    // ═══════════════════════════════════════════════════════════════════════════════════
-    // SECCIÓN 2: REFERENCIAS A ELEMENTOS DEL DOM
-    // ═══════════════════════════════════════════════════════════════════════════════════
-
-    // ============================================
-    // 🎯 REFERENCIAS A ELEMENTOS HTML PRINCIPALES
-    // ============================================
-    // Propósito: Almacena referencias a elementos HTML para acceso rápido sin queries repetidas.
-    // Optimización: Reduce el costo computacional evitando búsquedas repetidas del mismo elemento.
-    // Actualización: Se realiza una única vez al cargar la página.
     const listaCitas = document.getElementById('listaCitas');
     const filtroEstado = document.getElementById('filtroEstado');
     const formCita = document.getElementById('formCita');
@@ -219,41 +188,18 @@
     const confirmEliminarModal = new bootstrap.Modal(confirmEliminarEl);
     const btnAgregar = document.getElementById('btnAgregar');
 
-    // ============================================
-    // 🗑️ VARIABLE AUXILIAR PARA ELIMINACIÓN
-    // ============================================
-    // Propósito: Almacena el ID de la cita a eliminar durante el proceso de confirmación.
-    // Uso: Se establece cuando el usuario hace clic en "Eliminar" y se usa al confirmar.
-    // Seguridad: Evita eliminar la cita incorrecta si el usuario cancela y vuelve a intentar.
     let idAEliminar = null;
 
     // ═══════════════════════════════════════════════════════════════════════════════════
     // SECCIÓN 3: FUNCIONES PRINCIPALES DE GESTIÓN
     // ═══════════════════════════════════════════════════════════════════════════════════
 
-    // ============================================
-    // 🎨 FUNCIÓN PRINCIPAL: renderCitas()
-    // ============================================
-    // Propósito: Renderiza (dibuja) todas las tarjetas de citas en la página.
-    // Responsabilidades: Filtrado, creación HTML, adjunción de listeners.
-    // Llamadas: Se ejecuta al cargar la página y después de cualquier cambio en datos.
-    // Nota: Es la función "madre" que controla toda la interfaz visual.
     function renderCitas() {
-      // ---- FUNCIÓN SECUNDARIA: Obtener filtro seleccionado ----
-      // Lee el valor del selector de filtro para determinar qué citas mostrar.
       const filtro = filtroEstado.value;
-      
-      // ---- FUNCIÓN SECUNDARIA: Limpiar contenedor ----
-      // Borra todas las tarjetas anteriores para renderizar una lista fresca.
       listaCitas.innerHTML = '';
 
-      // ---- FUNCIÓN SECUNDARIA: Filtrar citas por estado ----
-      // Filtra el array de citas según la opción seleccionada.
-      // Si es "todas", muestra todas las citas; si no, solo las del estado seleccionado.
       const filtered = citas.filter(c => (filtro === 'todas' ? true : c.estado === filtro));
 
-      // ---- FUNCIÓN SECUNDARIA: Mostrar mensaje si no hay citas ----
-      // Si el filtro no devuelve resultados, muestra un mensaje de lista vacía.
       if (filtered.length === 0) {
         listaCitas.innerHTML = `
         <div style="text-align: center; color: rgba(255,255,255,0.6); width: 100%; padding: 3rem;">
@@ -264,22 +210,13 @@
         return;
       }
 
-      // ---- FUNCIÓN SECUNDARIA: Iterar sobre citas y crear tarjetas ----
-      // Para cada cita filtrada, genera un elemento HTML visual.
       filtered.forEach((cita, index) => {
-        // ---- FUNCIÓN TERCIARIA: Crear contenedor de tarjeta ----
-        // Crea un div que actuará como contenedor de la tarjeta visual.
         const card = document.createElement('div');
         card.className = 'card card-cita shadow-sm';
         card.style.animationDelay = `${index * 0.1}s`;
 
-        // ---- FUNCIÓN TERCIARIA: Obtener URL del GIF ----
-        // Busca el GIF correspondiente al tipo de mascota de esta cita.
         const gifUrl = getGifUrl(cita.tipo);
 
-        // ---- FUNCIÓN TERCIARIA: Construir HTML de la tarjeta ----
-        // Crea el contenido HTML con todos los datos de la cita formateados.
-        // Incluye: ID, nombre mascota, propietario, teléfono, fecha, hora, tipo, síntomas.
         card.innerHTML = `
         <div class="card-body">
           <div style="text-align: center; margin-bottom: 1rem;">
@@ -308,49 +245,21 @@
           </div>
         </div>
       `;
-        // ---- FUNCIÓN TERCIARIA: Agregar tarjeta al DOM ----
-        // Inserta la tarjeta creada en el contenedor de lista de citas.
         listaCitas.appendChild(card);
       });
 
-      // ============================================
-      // 🔄 FUNCIÓN SECUNDARIA: Adjuntar listeners a selectores de estado
-      // ============================================
-      // Propósito: Escucha cambios en los selectores de estado dentro de cada tarjeta.
-      // Comportamiento: Cuando el usuario cambia el estado, actualiza el array y re-renderiza.
-      // Nota: Se ejecuta después de crear todas las tarjetas.
       document.querySelectorAll('.estado-select').forEach(s => {
         s.addEventListener('change', (e) => {
-          // ---- FUNCIÓN TERCIARIA: Obtener ID del selector ----
-          // Extrae el ID de la cita del atributo data-id.
           const id = e.target.dataset.id;
-          
-          // ---- FUNCIÓN TERCIARIA: Buscar cita en el array ----
-          // Localiza la cita modificada usando el ID.
           const c = citas.find(x => x.id === id);
-
-          // ---- FUNCIÓN TERCIARIA: Actualizar estado y re-renderizar ----
-          // Si encuentra la cita, actualiza su estado y vuelve a dibujar.
           if (c) { c.estado = e.target.value; renderCitas(); }
         });
       });
 
-      // ============================================
-      // ✏️ FUNCIÓN SECUNDARIA: Adjuntar listeners a botones de editar
-      // ============================================
-      // Propósito: Escucha clics en botones de editar dentro de cada tarjeta.
-      // Comportamiento: Abre el modal con los datos de la cita para edición.
-      // Nota: Solo adjunta listeners a botones creados en esta ejecución.
       document.querySelectorAll('.btn-editar').forEach(b => {
         b.addEventListener('click', () => abrirEditar(b.dataset.id));
       });
 
-      // ============================================
-      // 🗑️ FUNCIÓN SECUNDARIA: Adjuntar listeners a botones de eliminar
-      // ============================================
-      // Propósito: Escucha clics en botones de eliminar dentro de cada tarjeta.
-      // Comportamiento: Muestra un modal de confirmación antes de eliminar.
-      // Seguridad: Requiere confirmación del usuario para evitar eliminaciones accidentales.
       document.querySelectorAll('.btn-eliminar').forEach(b => {
         b.addEventListener('click', () => confirmarEliminar(b.dataset.id));
       });
@@ -360,64 +269,26 @@
     // SECCIÓN 4: FUNCIONES DE UTILIDAD Y TRANSFORMACIÓN DE DATOS
     // ═══════════════════════════════════════════════════════════════════════════════════
 
-    // ============================================
-    // 🖼️ FUNCIÓN: obtenerUrlGif()
-    // ============================================
-    // Propósito: Retorna la URL del GIF correspondiente al tipo de mascota.
-    // Parámetros: tipo (string) - tipo de mascota seleccionado
-    // Retorna: URL del GIF o GIF por defecto si no existe el tipo
-    // Uso: Se invoca desde renderCitas() para cada cita.
     function getGifUrl(tipo) {
       return gifMap[tipo] || gifMap[''];
     }
 
-    // ============================================
-    // 🛡️ FUNCIÓN: escaparHtml()
-    // ============================================
-    // Propósito: Escapa caracteres especiales HTML para prevenir inyección de código.
-    // Parámetros: text (string) - texto a escapar
-    // Retorna: texto con caracteres especiales escapados
-    // Seguridad: Previene ataques XSS (Cross-Site Scripting) al escapar: <, >, &, ", '
-    // Uso: Se aplica a todos los campos de texto que se muestran en la página.
     function escapeHtml(text) {
-      // ---- FUNCIÓN TERCIARIA: Verificar si el texto existe ----
-      // Retorna string vacío si el texto es null, undefined o falsy.
       if (!text) return '';
-      
-      // ---- FUNCIÓN TERCIARIA: Reemplazar caracteres especiales ----
-      // Reemplaza cada carácter especial por su entidad HTML equivalente.
       return text
-        .replace(/&/g, '&amp;')    // & → &amp;
-        .replace(/</g, '&lt;')     // < → &lt;
-        .replace(/>/g, '&gt;')     // > → &gt;
-        .replace(/"/g, '&quot;')   // " → &quot;
-        .replace(/'/g, '&#039;');  // ' → &#039;
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
     }
 
-    // ============================================
-    // 📅 FUNCIÓN: formatearFecha()
-    // ============================================
-    // Propósito: Convierte formato de fecha ISO (YYYY-MM-DD) a formato local (DD/MM/YYYY).
-    // Parámetros: dateStr (string) - fecha en formato ISO (ej: "2026-02-15")
-    // Retorna: fecha formateada como DD/MM/YYYY (ej: "15/2/2026")
-    // Beneficio: Mejora la legibilidad para usuarios hispanohablantes.
     function formatFecha(dateStr) {
-      // ---- FUNCIÓN TERCIARIA: Validar que la fecha exista ----
-      // Retorna string vacío si no hay fecha proporcionada.
       if (!dateStr) return '';
-      
-      // ---- FUNCIÓN TERCIARIA: Dividir fecha en componentes ----
-      // Separa la fecha ISO en partes: [año, mes, día]
       const parts = dateStr.split('-');
-      
-      // ---- FUNCIÓN TERCIARIA: Extraer y convertir componentes ----
-      // Convierte cada parte a número entero (base 10).
-      const y = parseInt(parts[0], 10);  // Año
-      const m = parseInt(parts[1], 10);  // Mes
-      const d = parseInt(parts[2], 10);  // Día
-      
-      // ---- FUNCIÓN TERCIARIA: Retornar fecha formateada ----
-      // Reorganiza los componentes en formato DD/MM/YYYY.
+      const y = parseInt(parts[0], 10);
+      const m = parseInt(parts[1], 10);
+      const d = parseInt(parts[2], 10);
       return `${d}/${m}/${y}`;
     }
 
@@ -425,29 +296,13 @@
     // SECCIÓN 5: FUNCIONES DE FORMULARIO Y EDICIÓN
     // ═══════════════════════════════════════════════════════════════════════════════════
 
-    // ============================================
-    // ✏️ FUNCIÓN: abrirEditar()
-    // ============================================
-    // Propósito: Carga los datos de una cita existente en el formulario modal para edición.
-    // Parámetros: id (string) - ID de la cita a editar
-    // Comportamiento: Busca la cita, rellena todos los campos del formulario y abre el modal.
-    // Proceso: 1. Buscar cita, 2. Limpiar validaciones, 3. Rellenar campos, 4. Mostrar modal.
     function abrirEditar(id) {
-      // ---- FUNCIÓN SECUNDARIA: Buscar cita por ID ----
-      // Recorre el array de citas hasta encontrar la que coincida con el ID proporcionado.
       const c = citas.find(x => x.id === id);
-      
-      // ---- FUNCIÓN SECUNDARIA: Validar existencia de cita ----
-      // Si no encuentra la cita, detiene la ejecución.
       if (!c) return;
 
-      // ---- FUNCIÓN SECUNDARIA: Limpiar validaciones ANTES de rellenar ----
-      // Remueve la clase que muestra los estados de validación previos.
       formCita.classList.remove('was-validated');
       removeValidationStates();
 
-      // ---- FUNCIÓN SECUNDARIA: Rellenar campos del formulario ----
-      // Asigna los valores actuales de la cita a cada campo del formulario modal.
       document.getElementById('citaId').value = c.id;
       document.getElementById('mascota').value = c.mascota;
       document.getElementById('propietario').value = c.propietario;
@@ -458,65 +313,29 @@
       document.getElementById('sintomas').value = c.sintomas;
       document.getElementById('estado').value = c.estado;
 
-      // ---- FUNCIÓN TERCIARIA: Cambiar título del modal ----
-      // Actualiza el título para indicar que se está editando una cita existente.
       document.getElementById('modalTitulo').textContent = `Editar cita de ${escapeHtml(c.mascota)}`;
 
-      // ---- FUNCIÓN TERCIARIA: Establecer fecha mínima ----
-      // Configura la restricción de fechas para edición.
       setMinFechaManana();
 
-      // ---- FUNCIÓN TERCIARIA: Mostrar modal ----
-      // Abre el modal Bootstrap para que el usuario pueda editar los datos.
       modalCita.show();
     }
 
-    // ============================================
-    // 🧹 FUNCIÓN: removerEstadosValidacion()
-    // ============================================
-    // Propósito: Limpia las clases de validación visual (is-valid, is-invalid) de los campos.
-    // Comportamiento: Elimina clases de Bootstrap que muestran el estado de validación.
-    // Campos afectados: mascota, propietario, teléfono, fecha, hora, síntomas.
-    // Uso: Se llama al abrir el formulario y al cerrar para limpiar estados previos.
     function removeValidationStates() {
-      // ---- FUNCIÓN TERCIARIA: Recorrer array de IDs de campos ----
-      // Itera sobre una lista predefinida de IDs que necesitan limpieza.
-      ['mascota', 'propietario', 'telefono', 'fecha', 'hora', 'sintomas'].forEach(id => {
-        // ---- FUNCIÓN CUATERNARIA: Obtener elemento del DOM ----
-        // Busca el elemento por su ID.
+      ['mascota', 'propietario', 'telefono', 'fecha', 'hora', 'sintomas', 'tipo', 'estado'].forEach(id => {
         const el = document.getElementById(id);
-        
-        // ---- FUNCIÓN CUATERNARIA: Remover clases de validación ----
-        // Si el elemento existe, elimina las clases is-valid e is-invalid.
         el && el.classList.remove('is-valid', 'is-invalid');
       });
     }
 
-    // ============================================
-    // 📆 FUNCIÓN: establecerFechaMinima()
-    // ============================================
-    // Propósito: Establece la fecha mínima permitida en el campo de fecha como mañana.
-    // Comportamiento: Calcula mañana's date y la asigna como atributo 'min' del input de fecha.
-    // Restricción: Impide que el usuario seleccione fechas en el pasado o hoy.
-    // Beneficio: Asegura que las citas sean siempre para fechas futuras.
     function setMinFechaManana() {
-      // ---- FUNCIÓN SECUNDARIA: Obtener fecha de hoy ----
-      // Crea un objeto Date con la fecha y hora actual.
       const hoy = new Date();
-
-      // ---- FUNCIÓN SECUNDARIA: Calcular mañana ----
-      // Suma un día a la fecha actual para obtener mañana.
       const manana = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() + 1);
 
-      // ---- FUNCIÓN SECUNDARIA: Formatear fecha como YYYY-MM-DD ----
-      // Convierte la fecha calculada al formato que HTML5 date input espera.
       const yyyy = manana.getFullYear();
-      const mm = String(manana.getMonth() + 1).padStart(2, '0');  // Asegura 2 dígitos
-      const dd = String(manana.getDate()).padStart(2, '0');       // Asegura 2 dígitos
+      const mm = String(manana.getMonth() + 1).padStart(2, '0');
+      const dd = String(manana.getDate()).padStart(2, '0');
       const minStr = `${yyyy}-${mm}-${dd}`;
 
-      // ---- FUNCIÓN SECUNDARIA: Asignar atributo mínimo ----
-      // Establece el atributo 'min' en el input de fecha.
       document.getElementById('fecha').setAttribute('min', minStr);
     }
 
@@ -524,129 +343,61 @@
     // SECCIÓN 6: FUNCIONES DE ELIMINACIÓN Y CONFIRMACIÓN
     // ═══════════════════════════════════════════════════════════════════════════════════
 
-    // ============================================
-    // ⚠️ FUNCIÓN: confirmarEliminar()
-    // ============================================
-    // Propósito: Muestra un modal de confirmación antes de eliminar una cita.
-    // Parámetros: id (string) - ID de la cita a eliminar
-    // Comportamiento: Almacena el ID y abre el modal de confirmación.
-    // Seguridad: Requiere confirmación del usuario antes de eliminar permanentemente.
     function confirmarEliminar(id) {
-      // ---- FUNCIÓN SECUNDARIA: Almacenar ID a eliminar ----
-      // Guarda el ID en una variable global para usarlo después cuando se confirme.
       idAEliminar = id;
-
-      // ---- FUNCIÓN SECUNDARIA: Mostrar modal de confirmación ----
-      // Abre el modal Bootstrap que pide confirmación al usuario.
       confirmEliminarModal.show();
     }
 
-    // ============================================
-    // 🗑️ FUNCIÓN: Eliminar cita confirmada
-    // ============================================
-    // Propósito: Elimina la cita del array cuando se confirma la eliminación.
-    // Comportamiento: Filtra la cita del array, cierra el modal y re-renderiza la lista.
-    // Activación: Se ejecuta cuando el usuario hace clic en el botón "ELIMINAR" del modal.
-    // Nota: idAEliminar debe estar establecido antes de ejecutarse.
     document.getElementById('btnConfirmDelete').addEventListener('click', () => {
-      // ---- FUNCIÓN SECUNDARIA: Validar que haya ID a eliminar ----
-      // Verifica que exista un ID antes de intentar eliminarlo.
       if (!idAEliminar) return;
-
-      // ---- FUNCIÓN SECUNDARIA: Filtrar cita del array ----
-      // Crea un nuevo array sin la cita que tiene el ID a eliminar.
-      // Mantiene todas las citas que NO coinciden con el ID.
       citas = citas.filter(c => c.id !== idAEliminar);
-
-      // ---- FUNCIÓN SECUNDARIA: Limpiar variable temporal ----
-      // Resetea la variable que almacenaba el ID para evitar eliminaciones accidentales.
       idAEliminar = null;
-
-      // ---- FUNCIÓN SECUNDARIA: Cerrar modal ----
-      // Oculta el modal de confirmación.
       confirmEliminarModal.hide();
-
-      // ---- FUNCIÓN SECUNDARIA: Re-renderizar lista ----
-      // Vuelve a dibujar todas las citas para reflejar la eliminación.
       renderCitas();
     });
 
     // ═══════════════════════════════════════════════════════════════════════════════════
-    // SECCIÓN 7: FUNCIONES DE VALIDACIÓN DEL FORMULARIO
-    // ════════════════════════════════════════════════════════��══════════════════════════
+    // SECCIÓN 7: FUNCIONES DE VALIDACIÓN DEL FORMULARIO (MEJORADA)
+    // ═══════════════════════════════════════════════════════════════════════════════════
 
-    // ============================================
-    // ✅ FUNCIÓN PRINCIPAL: Envío del Formulario
-    // ============================================
-    // Propósito: Valida todos los campos del formulario y guarda o actualiza la cita.
-    // Validaciones: Nombre, propietario, teléfono, fecha, hora, síntomas y estado.
-    // Comportamiento: Si es válido, guarda/actualiza la cita, cierra el modal y re-renderiza.
-    // Pasos: HTML5 → Teléfono → Fecha → Hora → Guardar → Limpiar → Cerrar
     formCita.addEventListener('submit', function (e) {
-      // ---- FUNCIÓN SECUNDARIA: Prevenir envío por defecto ----
-      // Previene que el navegador envíe el formulario de manera tradicional.
       e.preventDefault();
       e.stopPropagation();
 
-      // ---- FUNCIÓN SECUNDARIA: Validación básica de HTML5 ----
-      // Verifica que todos los campos requeridos tengan valores.
+      // ✅ SOLO agrega was-validated al enviar
       if (!formCita.checkValidity()) {
         formCita.classList.add('was-validated');
         return;
       }
 
-      // ============================================
-      // 📱 FUNCIÓN TERCIARIA: Validar Teléfono
-      // ============================================
-      // Propósito: Valida que el teléfono tenga entre 7 y 15 dígitos.
-      // Lógica: Extrae solo dígitos y verifica la cantidad.
-      // Acción: Muestra error visual si es inválido, o lo formatea si es válido.
+      // Validación de teléfono
       const telInput = document.getElementById('telefono');
       const telRaw = telInput.value || '';
-      
-      // ---- FUNCIÓN CUATERNARIA: Extraer solo dígitos ----
-      // Elimina cualquier carácter que no sea número.
       const telDigits = telRaw.replace(/\D/g, '');
-      
-      // ---- FUNCIÓN CUATERNARIA: Validar rango de dígitos ----
-      // Comprueba que haya entre 7 y 15 dígitos.
+
       if (telDigits.length < 7 || telDigits.length > 15) {
         telInput.classList.add('is-invalid');
         telInput.classList.remove('is-valid');
         telInput.focus();
         return;
       } else {
-        // ---- FUNCIÓN CUATERNARIA: Formatear y aceptar teléfono ----
-        // Si es válido, lo guarda solo con dígitos.
         telInput.classList.remove('is-invalid');
         telInput.classList.add('is-valid');
         telInput.value = telDigits;
       }
 
-      // ============================================
-      // 📅 FUNCIÓN TERCIARIA: Validar Fecha
-      // ============================================
-      // Propósito: Valida que la fecha sea posterior a hoy (futuro).
-      // Lógica: Compara la fecha ingresada con la fecha actual.
-      // Acción: Muestra error si es en el pasado o igual a hoy.
+      // Validación de fecha
       const fechaVal = document.getElementById('fecha').value;
-      
-      // ---- FUNCIÓN CUATERNARIA: Verificar que haya fecha ----
-      // Comprueba que el campo no esté vacío.
       if (!fechaVal) {
         document.getElementById('fecha').classList.add('is-invalid');
         return;
       }
 
-      // ---- FUNCIÓN CUATERNARIA: Parsear fecha ISO ----
-      // Divide la fecha en componentes y crea un objeto Date.
       const parts = fechaVal.split('-');
       const fechaObj = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
       const ahora = new Date();
       const hoySolo = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
 
-      // ---- FUNCIÓN CUATERNARIA: Comparar fechas ----
-      // Comprueba si la fecha ingresada es mayor a hoy.
       if (!(fechaObj > hoySolo)) {
         document.getElementById('fecha').classList.add('is-invalid');
         document.getElementById('fecha').classList.remove('is-valid');
@@ -657,16 +408,8 @@
         document.getElementById('fecha').classList.add('is-valid');
       }
 
-      // ============================================
-      // 🕐 FUNCIÓN TERCIARIA: Validar Hora
-      // ============================================
-      // Propósito: Valida que la hora esté dentro del horario permitido (08:00 - 20:00).
-      // Lógica: Compara la hora en formato de texto (comparación string funciona correctamente).
-      // Acción: Muestra error si está fuera del horario permitido.
+      // Validación de hora
       const horaVal = document.getElementById('hora').value;
-      
-      // ---- FUNCIÓN CUATERNARIA: Comparar horarios ----
-      // Verifica que la hora esté entre 08:00 y 20:00 (inclusive).
       if (!(horaVal >= '08:00' && horaVal <= '20:00')) {
         document.getElementById('hora').classList.add('is-invalid');
         document.getElementById('hora').classList.remove('is-valid');
@@ -677,17 +420,11 @@
         document.getElementById('hora').classList.add('is-valid');
       }
 
-      // ============================================
-      // 💾 FUNCIÓN SECUNDARIA: Crear o Actualizar Cita
-      // ============================================
-      // Propósito: Construye el objeto de cita y lo guarda o actualiza en el array.
-      // Lógica: Si hay ID, actualiza; si no, crea una nueva cita.
+      // Crear o actualizar cita
       const id = document.getElementById('citaId').value;
-      
-      // ---- FUNCIÓN TERCIARIA: Construir objeto de cita ----
-      // Crea un objeto con todos los datos validados de la cita.
+
       const nueva = {
-        id: id || String(proximoId++),  // Si no hay ID, genera uno nuevo
+        id: id || String(proximoId++),
         mascota: document.getElementById('mascota').value.trim(),
         propietario: document.getElementById('propietario').value.trim(),
         telefono: document.getElementById('telefono').value.trim(),
@@ -698,36 +435,21 @@
         estado: document.getElementById('estado').value
       };
 
-      // ---- FUNCIÓN TERCIARIA: Actualizar cita existente o crear nueva ----
-      // Si el ID existe, actualiza la cita; si no, agrega una nueva al array.
       if (id) {
-        // ---- FUNCIÓN CUATERNARIA: Buscar índice de cita ----
-        // Localiza la posición de la cita a actualizar en el array.
         const idx = citas.findIndex(c => c.id === id);
-        
-        // ---- FUNCIÓN CUATERNARIA: Reemplazar datos antiguos ----
-        // Si encuentra la cita, reemplaza sus datos con los nuevos.
         if (idx >= 0) citas[idx] = nueva;
       } else {
-        // ---- FUNCIÓN CUATERNARIA: Agregar nueva cita al array ----
-        // Si es una cita nueva, la agrega al final del array.
         citas.push(nueva);
       }
 
-      // ---- FUNCIÓN TERCIARIA: Limpiar formulario ----
-      // Resetea todos los campos después de guardar.
+      // ✅ Limpiar validaciones después de guardar
       formCita.reset();
       formCita.classList.remove('was-validated');
       document.getElementById('citaId').value = '';
       document.getElementById('modalTitulo').textContent = 'Guardar nueva cita';
       removeValidationStates();
 
-      // ---- FUNCIÓN TERCIARIA: Cerrar modal ----
-      // Oculta el modal después de guardar.
       modalCita.hide();
-
-      // ---- FUNCIÓN TERCIARIA: Re-renderizar lista ----
-      // Vuelve a dibujar todas las citas para mostrar los cambios.
       renderCitas();
     });
 
@@ -735,72 +457,26 @@
     // SECCIÓN 8: EVENT LISTENERS PRINCIPALES
     // ═══════════════════════════════════════════════════════════════════════════════════
 
-    // ============================================
-    // ➕ EVENT LISTENER: Botón Agregar Nueva Cita
-    // ============================================
-    // Propósito: Limpia el formulario modal para crear una nueva cita.
-    // Comportamiento: Resetea todos los campos, elimina validaciones previas y establece fecha mínima.
-    // Disparo: Cuando el usuario hace clic en "AGREGAR CITA".
-    // Nota: Se ejecuta ANTES de que se abra el modal (data-bs-toggle maneja eso).
     btnAgregar.addEventListener('click', () => {
-      // ---- FUNCIÓN SECUNDARIA: Limpiar clases de validación ----
-      // Remueve la clase que muestra los estados de validación.
+      // ✅ Quita la clase was-validated al abrir
       formCita.classList.remove('was-validated');
-
-      // ---- FUNCIÓN SECUNDARIA: Resetear formulario ----
-      // Limpia todos los campos del formulario a sus valores iniciales.
       formCita.reset();
-
-      // ---- FUNCIÓN SECUNDARIA: Limpiar ID de cita ----
-      // Asegura que no haya ID guardado (indica que es una cita nueva, no edición).
       document.getElementById('citaId').value = '';
-      
-      // ---- FUNCIÓN SECUNDARIA: Actualizar título del modal ----
-      // Cambia el título para indicar que es una cita nueva.
       document.getElementById('modalTitulo').textContent = 'Guardar nueva cita';
-
-      // ---- FUNCIÓN SECUNDARIA: Limpiar validaciones visuales ----
-      // Elimina las clases de validación (is-valid, is-invalid).
       removeValidationStates();
-
-      // ---- FUNCIÓN SECUNDARIA: Establecer fecha mínima ----
-      // Configura que no se pueda seleccionar fechas pasadas.
       setMinFechaManana();
     });
 
-    // ============================================
-    // 🪟 EVENT LISTENER: Apertura del Modal de Cita
-    // ============================================
-    // Propósito: Establece la fecha mínima permitida cuando se abre el modal de cita.
-    // Disparo: Cuando Bootstrap abre el modal #modalCita.
-    // Nota: Se usa el evento show.bs.modal de Bootstrap.
-    // Beneficio: Asegura que siempre se calcule mañana como fecha mínima al abrir.
     modalCitaEl.addEventListener('show.bs.modal', () => {
-      // ---- FUNCIÓN SECUNDARIA: Configurar restricción de fecha ----
-      // Asegura que siempre se calcule mañana como fecha mínima.
       setMinFechaManana();
     });
 
-    // ============================================
-    // 🔍 EVENT LISTENER: Cambio de Filtro de Estado
-    // ============================================
-    // Propósito: Re-renderiza las citas cada vez que cambia el filtro de estado.
-    // Disparo: Cuando el usuario selecciona una opción diferente en el dropdown de filtro.
-    // Efecto: Muestra/oculta citas según su estado seleccionado.
-    // Uso: Permite al usuario ver solo las citas que le interesan.
     filtroEstado.addEventListener('change', renderCitas);
 
     // ═══════════════════════════════════════════════════════════════════════════════════
     // SECCIÓN 9: INICIALIZACIÓN DE LA APLICACIÓN
     // ═══════════════════════════════════════════════════════════════════════════════════
 
-    // ============================================
-    // 🚀 RENDERIZADO INICIAL
-    // ============================================
-    // Propósito: Dibuja las citas en la página cuando se carga el documento.
-    // Ejecución: Se ejecuta una única vez al cargar la página.
-    // Efecto: Muestra todas las citas disponibles en el array inicial.
-    // Nota: Esta es la última línea del script, se ejecuta después de definir todo.
     renderCitas();
   </script>
 
@@ -819,7 +495,6 @@
       overflow-x: hidden;
     }
 
-    /* Fondo animado con patrón */
     body::before {
       content: '';
       position: fixed;
@@ -839,7 +514,6 @@
       z-index: 1;
     }
 
-    /* Header mejorado */
     .header-section {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       padding: 2.5rem;
@@ -881,7 +555,6 @@
     }
 
     @keyframes float {
-
       0%,
       100% {
         transform: translateY(0px);
@@ -892,7 +565,6 @@
       }
     }
 
-    /* Botón Agregar mejorado */
     #btnAgregar {
       background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
       border: none;
@@ -918,7 +590,6 @@
       transform: translateY(-50%) scale(0.98);
     }
 
-    /* Sección de filtros mejorada */
     .filter-section {
       background: rgba(255, 255, 255, 0.08);
       padding: 2rem;
@@ -977,7 +648,6 @@
       color: white;
     }
 
-    /* Separador mejorado */
     .barra-verde {
       height: 4px;
       background: linear-gradient(90deg, #f093fb 0%, #f5576c 50%, #667eea 100%);
@@ -986,7 +656,6 @@
       box-shadow: 0 4px 15px rgba(245, 87, 108, 0.3);
     }
 
-    /* Grid de tarjetas */
     #listaCitas {
       gap: 2rem !important;
       animation: fadeIn 0.6s ease-out 0.4s both;
@@ -1002,7 +671,6 @@
       }
     }
 
-    /* Tarjetas mejoradas */
     .card-cita {
       max-width: 360px;
       background: rgba(255, 255, 255, 0.08);
@@ -1082,7 +750,6 @@
       font-weight: 600;
     }
 
-    /* Selector de estado mejorado */
     .estado-select {
       background: rgba(255, 255, 255, 0.1) !important;
       border: 1.5px solid rgba(102, 126, 234, 0.4) !important;
@@ -1108,7 +775,6 @@
       color: white;
     }
 
-    /* Botones de acción mejorados */
     .btn-editar,
     .btn-eliminar {
       border-radius: 8px;
@@ -1144,7 +810,6 @@
       box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
     }
 
-    /* Modales mejorados */
     .modal-content {
       background: linear-gradient(135deg, #0f0c29 0%, #302b63 100%);
       border: 1px solid rgba(102, 126, 234, 0.3);
@@ -1202,11 +867,24 @@
       color: white;
     }
 
+    /* ✅ ESTILOS DE VALIDACIÓN MEJORADOS */
     .invalid-feedback {
       color: #ff6b6b;
       font-weight: 500;
-      display: block;
+      display: none;
       margin-top: 0.5rem;
+    }
+
+    /* ✅ Mostrar mensaje SOLO cuando hay was-validated Y el campo es inválido */
+    .was-validated .form-control:invalid,
+    .was-validated .form-select:invalid {
+      border-color: #ff6b6b;
+      box-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+    }
+
+    .was-validated .form-control:invalid ~ .invalid-feedback,
+    .was-validated .form-select:invalid ~ .invalid-feedback {
+      display: block;
     }
 
     .is-invalid {
@@ -1214,12 +892,15 @@
       box-shadow: 0 0 10px rgba(255, 107, 107, 0.3) !important;
     }
 
+    .is-invalid ~ .invalid-feedback {
+      display: block !important;
+    }
+
     .is-valid {
       border-color: #51cf66 !important;
       box-shadow: 0 0 10px rgba(81, 207, 102, 0.3) !important;
     }
 
-    /* Botones del modal */
     .modal-footer {
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       padding: 1.5rem;
@@ -1271,7 +952,6 @@
       color: white;
     }
 
-    /* Modal de confirmación */
     .modal-content {
       animation: modalFadeIn 0.3s ease-out;
     }
@@ -1288,7 +968,6 @@
       }
     }
 
-    /* Estilos para las imágenes GIF */
     .gif-mascota {
       width: 100px;
       height: 100px;
@@ -1303,7 +982,6 @@
       transform: scale(1.05);
     }
 
-    /* Responsive */
     @media (max-width: 768px) {
       .header-section {
         padding: 1.5rem;
@@ -1339,7 +1017,6 @@
       }
     }
 
-    /* Efecto de carga */
     .card-cita {
       animation-delay: 0.1s;
     }
